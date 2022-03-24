@@ -1,19 +1,14 @@
 /**
- * @description       : a. Displays all Config records in a 3-column list: Label, Type and Amount.
-                        b. User can select multiple records and after pressing the “Add” button they will be
-                        added to the Case Configs list (also new Case Config records are saved to the
-                        database).
-                        c. If a Config record has already been added to the Case Configs list it cannot be
-                        added a second time.
- * @author            : girish
- * @group             : 
+ * @description       : a. Displays added Config records in a 3-column list: Label, Type and Amount.
+												b. When a user adds new Config records, new records appear in this list without
+												having to refresh the page.
  * @last modified on  : 24/03/2022
- * @last modified by  : girish
 **/
-import { LightningElement, track, wire } from "lwc";
-import getAllConfigs from "@salesforce/apex/AvailableConfigsController.getAllConfigs";
+import { api, LightningElement, track, wire } from "lwc";
+import getCaseConfigs from "@salesforce/apex/CaseConfigsController.getCaseConfigs";
+export default class CaseConfigs extends LightningElement {
+  @api recordId;
 
-export default class AvailableConfigs extends LightningElement {
   columns = [
     { label: "Label", fieldName: "label", hideDefaultActions: true },
     { label: "Type", fieldName: "type", hideDefaultActions: true },
@@ -27,8 +22,8 @@ export default class AvailableConfigs extends LightningElement {
 
   @track data = [];
 
-  @wire(getAllConfigs)
-  wiredConfigs({ data, error }) {
+  @wire(getCaseConfigs, { caseId: "$recordId" })
+  wiredCaseConfigs({ data, error }) {
     if (error) {
       this.error = "Unknown error";
       if (Array.isArray(error.body)) {

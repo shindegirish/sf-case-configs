@@ -1,5 +1,14 @@
 <template>
-  <lightning-datatable key-field="id" data={data} columns={columns}>
-  </lightning-datatable>
-  <lightning-button label="Add" onclick={handleConfigAdd}></lightning-button>
+  <lightning-card title="Available Configs" icon-name="custom:custom19">
+    <div class="slds-var-p-vertical_medium slds-var-p-horizontal_x-small">
+      <lightning-datatable key-field="id" data={data} columns={columns}>
+      </lightning-datatable>
+    </div>
+    <lightning-button
+      class="slds-var-p-vertical_medium slds-align_absolute-center"
+      label="Add"
+      variant="brand"
+      onclick={handleConfigAdd}
+    ></lightning-button>
+  </lightning-card>
 </template>
