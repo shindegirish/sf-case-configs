@@ -7,14 +7,16 @@
 import { api, LightningElement, track, wire } from "lwc";
 import getCaseConfigs from "@salesforce/apex/CaseConfigsController.getCaseConfigs";
 export default class CaseConfigs extends LightningElement {
+  // public props
   @api recordId;
 
+  //reactive props
   columns = [
-    { label: "Label", fieldName: "label", hideDefaultActions: true },
-    { label: "Type", fieldName: "type", hideDefaultActions: true },
+    { label: "Label", fieldName: "Label__c", hideDefaultActions: true },
+    { label: "Type", fieldName: "Type__c", hideDefaultActions: true },
     {
       label: "Amount",
-      fieldName: "amount",
+      fieldName: "Amount__c",
       type: "number",
       hideDefaultActions: true
     }
@@ -22,8 +24,10 @@ export default class CaseConfigs extends LightningElement {
 
   @track data = [];
 
+  //wires
   @wire(getCaseConfigs, { caseId: "$recordId" })
   wiredCaseConfigs({ data, error }) {
+    // to do - handle errors
     if (error) {
       this.error = "Unknown error";
       if (Array.isArray(error.body)) {
@@ -33,22 +37,6 @@ export default class CaseConfigs extends LightningElement {
       }
       return;
     }
-    this.setData(data);
-  }
-
-  setData(rawData = []) {
-    if (!rawData) {
-      this.data = [];
-      return;
-    }
-    this.data = rawData.map((config) => {
-      const { Id, Label__c, Type__c, Amount__c } = config;
-      return {
-        id: Id,
-        label: Label__c,
-        type: Type__c,
-        amount: Amount__c
-      };
-    });
+    this.data = data;
   }
 }

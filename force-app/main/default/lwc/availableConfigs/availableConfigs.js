@@ -16,8 +16,10 @@ import addConfigsToCase from "@salesforce/apex/AvailableConfigsController.addCon
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 export default class AvailableConfigs extends LightningElement {
+  //public properties
   @api recordId; // to get case id
 
+  //reactive properties
   columns = [
     { label: "Label", fieldName: "Label__c", hideDefaultActions: true },
     { label: "Type", fieldName: "Type__c", hideDefaultActions: true },
@@ -31,6 +33,7 @@ export default class AvailableConfigs extends LightningElement {
 
   @track data = [];
 
+  //wired calls
   @wire(getAllConfigs)
   wiredConfigs({ data, error }) {
     //to do process errors
@@ -46,31 +49,43 @@ export default class AvailableConfigs extends LightningElement {
     this.data = data;
   }
 
+  // event handlers
   async handleConfigAdd() {
+    //get selected rows
     const selectedConfigs = this.template
       .querySelector("lightning-datatable")
       .getSelectedRows();
 
-    if (selectedConfigs && selectedConfigs.length > 0) {
-      const payload = {
-        caseId: this.recordId,
-        configs: [...selectedConfigs]
-      };
-      const response = await addConfigsToCase(payload);
-      this.processResponse(response);
+    //validation
+    if (selectedConfigs.length === 0) {
+      this.showToast("Please select configs to add", undefined, "error");
+      return;
     }
+
+    //apex call to insert new case configs
+    const payload = {
+      caseId: this.recordId,
+      configs: [...selectedConfigs]
+    };
+    const response = await addConfigsToCase(payload);
+    this.processResponse(response);
   }
 
+  // method to process server response
   processResponse(response) {
     if (!response) {
       throw new Error("response is undefined");
     }
+
+    //get success record count
     const successRecordsCount = response.filter(
       (config) => config.success
     ).length;
 
+    //get error records
     const errRecrods = response.filter((config) => !config.success);
 
+    // show toast for successful and failed records
     if (successRecordsCount > 0) {
       this.showToast(
         `Successfully added ${successRecordsCount} configs to this case.`,
@@ -90,6 +105,7 @@ export default class AvailableConfigs extends LightningElement {
     }
   }
 
+  //generic method to fire show toast event
   showToast(title, message, variant) {
     const event = new ShowToastEvent({
       title,
