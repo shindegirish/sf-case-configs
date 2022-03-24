@@ -10,16 +10,20 @@
  * @last modified on  : 24/03/2022
  * @last modified by  : girish
 **/
-import { LightningElement, track, wire } from "lwc";
+import { api, LightningElement, track, wire } from "lwc";
 import getAllConfigs from "@salesforce/apex/AvailableConfigsController.getAllConfigs";
+import addConfigsToCase from "@salesforce/apex/AvailableConfigsController.addConfigsToCase";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 export default class AvailableConfigs extends LightningElement {
+  @api recordId; // to get case id
+
   columns = [
-    { label: "Label", fieldName: "label", hideDefaultActions: true },
-    { label: "Type", fieldName: "type", hideDefaultActions: true },
+    { label: "Label", fieldName: "Label__c", hideDefaultActions: true },
+    { label: "Type", fieldName: "Type__c", hideDefaultActions: true },
     {
       label: "Amount",
-      fieldName: "amount",
+      fieldName: "Amount__c",
       type: "number",
       hideDefaultActions: true
     }
@@ -29,6 +33,7 @@ export default class AvailableConfigs extends LightningElement {
 
   @wire(getAllConfigs)
   wiredConfigs({ data, error }) {
+    //to do process errors
     if (error) {
       this.error = "Unknown error";
       if (Array.isArray(error.body)) {
@@ -38,22 +43,59 @@ export default class AvailableConfigs extends LightningElement {
       }
       return;
     }
-    this.setData(data);
+    this.data = data;
   }
 
-  setData(rawData = []) {
-    if (!rawData) {
-      this.data = [];
-      return;
-    }
-    this.data = rawData.map((config) => {
-      const { Id, Label__c, Type__c, Amount__c } = config;
-      return {
-        id: Id,
-        label: Label__c,
-        type: Type__c,
-        amount: Amount__c
+  async handleConfigAdd() {
+    const selectedConfigs = this.template
+      .querySelector("lightning-datatable")
+      .getSelectedRows();
+
+    if (selectedConfigs && selectedConfigs.length > 0) {
+      const payload = {
+        caseId: this.recordId,
+        configs: [...selectedConfigs]
       };
+      const response = await addConfigsToCase(payload);
+      this.processResponse(response);
+    }
+  }
+
+  processResponse(response) {
+    if (!response) {
+      throw new Error("response is undefined");
+    }
+    const successRecordsCount = response.filter(
+      (config) => config.success
+    ).length;
+
+    const errRecrods = response.filter((config) => !config.success);
+
+    if (successRecordsCount > 0) {
+      this.showToast(
+        `Successfully added ${successRecordsCount} configs to this case.`,
+        undefined,
+        "success"
+      );
+    }
+
+    if (errRecrods.length > 0) {
+      errRecrods
+        .flatMap((e) => e.errors)
+        .forEach((err) => {
+          const { statusCode, message } = err;
+          // this can be made more user friendly
+          this.showToast(statusCode, message, "error");
+        });
+    }
+  }
+
+  showToast(title, message, variant) {
+    const event = new ShowToastEvent({
+      title,
+      message,
+      variant
     });
+    this.dispatchEvent(event);
   }
 }
