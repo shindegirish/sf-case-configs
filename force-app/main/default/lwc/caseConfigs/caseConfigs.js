@@ -6,6 +6,13 @@
 **/
 import { api, LightningElement, track, wire } from "lwc";
 import getCaseConfigs from "@salesforce/apex/CaseConfigsController.getCaseConfigs";
+import {
+  MessageContext,
+  subscribe,
+  unsubscribe
+} from "lightning/messageService";
+import notify from "@salesforce/messageChannel/caseConfigNotification__c";
+import { refreshApex } from "@salesforce/apex";
 export default class CaseConfigs extends LightningElement {
   // public props
   @api recordId;
@@ -23,10 +30,21 @@ export default class CaseConfigs extends LightningElement {
   ];
 
   @track data = [];
+  subscription;
+  cachedData;
 
   //wires
+  @wire(MessageContext)
+  messageContext;
+
   @wire(getCaseConfigs, { caseId: "$recordId" })
-  wiredCaseConfigs({ data, error }) {
+  wiredCaseConfigs(cachedData) {
+    this.processWiredData(cachedData);
+  }
+
+  processWiredData(cachedData) {
+    this.cachedData = cachedData;
+    const { data, error } = this.cachedData;
     // to do - handle errors
     if (error) {
       this.error = "Unknown error";
@@ -38,5 +56,32 @@ export default class CaseConfigs extends LightningElement {
       return;
     }
     this.data = data;
+  }
+
+  //event handlers
+  async handleNotification() {
+    refreshApex(this.cachedData);
+  }
+
+  //lifecycle hooks
+  connectedCallback() {
+    this.subscribeToMessageChannel();
+  }
+
+  disconnectedCallback() {
+    this.unsubscribeToMessageChannel();
+  }
+
+  subscribeToMessageChannel() {
+    if (!this.subscription) {
+      this.subscription = subscribe(this.messageContext, notify, () =>
+        this.handleNotification()
+      );
+    }
+  }
+
+  unsubscribeToMessageChannel() {
+    unsubscribe(this.subscription);
+    this.subscription = null;
   }
 }

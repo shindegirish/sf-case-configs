@@ -14,6 +14,8 @@ import { api, LightningElement, track, wire } from "lwc";
 import getAllConfigs from "@salesforce/apex/AvailableConfigsController.getAllConfigs";
 import addConfigsToCase from "@salesforce/apex/AvailableConfigsController.addConfigsToCase";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { MessageContext, publish } from "lightning/messageService";
+import notify from "@salesforce/messageChannel/caseConfigNotification__c";
 
 export default class AvailableConfigs extends LightningElement {
   //public properties
@@ -34,6 +36,9 @@ export default class AvailableConfigs extends LightningElement {
   @track data = [];
 
   //wired calls
+  @wire(MessageContext)
+  messageContext;
+
   @wire(getAllConfigs)
   wiredConfigs({ data, error }) {
     //to do process errors
@@ -58,7 +63,7 @@ export default class AvailableConfigs extends LightningElement {
 
     //validation
     if (selectedConfigs.length === 0) {
-      this.showToast("Please select configs to add", undefined, "error");
+      this.showToast("Please select at least one Config", undefined, "error");
       return;
     }
 
@@ -103,6 +108,7 @@ export default class AvailableConfigs extends LightningElement {
           this.showToast(statusCode, message, "error");
         });
     }
+    publish(this.messageContext, notify, {});
   }
 
   //generic method to fire show toast event
