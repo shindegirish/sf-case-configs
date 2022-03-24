@@ -6,6 +6,7 @@
 **/
 import { api, LightningElement, track, wire } from "lwc";
 import getCaseConfigs from "@salesforce/apex/CaseConfigsController.getCaseConfigs";
+import sendCaseConfigs from "@salesforce/apex/CaseConfigsController.sendCaseConfigs";
 import {
   MessageContext,
   subscribe,
@@ -59,6 +60,10 @@ export default class CaseConfigs extends LightningElement {
   }
 
   //event handlers
+  handleSendClick() {
+    sendCaseConfigs({ caseId: this.recordId });
+  }
+
   async handleNotification() {
     refreshApex(this.cachedData);
   }

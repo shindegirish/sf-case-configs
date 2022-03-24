@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
-    <masterLabel>Case Config Notification</masterLabel>
+    <description>This channel is used to notify Case Config component about newly added case configs</description>
     <isExposed>true</isExposed>
-    <description
-  >This channel is used to notify Case Config component about newly added case configs</description>
+    <masterLabel>Case Config Notification</masterLabel>
 </LightningMessageChannel>

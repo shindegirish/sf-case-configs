@@ -24,4 +24,23 @@ public with sharing class CaseConfigsController {
       throw new AuraHandledException(e.getMessage());
     }
   }
+
+  /**
+   * @description closed the case and sends the configs to external service
+   * @author girish | 25/03/2022
+   * @param caseId
+   * @return List<Case_Config__c>
+   **/
+  @AuraEnabled
+  public static void sendCaseConfigs(Id caseId) {
+    if (String.isBlank(caseId)) {
+      throw new AuraHandledException('Case Id cannot be null or blank');
+    }
+
+    try {
+      CaseConfigService.sendCaseConfigs(caseId);
+    } catch (Exception e) {
+      throw new AuraHandledException(e.getMessage());
+    }
+  }
 }

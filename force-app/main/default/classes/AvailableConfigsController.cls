@@ -22,7 +22,7 @@ public with sharing class AvailableConfigsController {
 
   /**
    * @description method to add Case configs
-   * @author gshinde@paypal.com | 25/03/2022
+   * @author girish | 25/03/2022
    * @param caseId
    * @param configs
    * @return Object

@@ -36,4 +36,51 @@ public with sharing class CaseConfigService {
     }
     return results;
   }
+
+  public static void sendCaseConfigs(Id caseId) {
+    // get the case and related configs
+    List<Case> caseList = [
+      SELECT
+        Id,
+        Status,
+        (SELECT Label__c, Type__c, Amount__c FROM Case_Configs__r)
+      FROM Case
+      WHERE Id = :caseId
+    ];
+
+    if (caseList.isEmpty()) {
+      return;
+    }
+
+    Case cs = caseList.get(0);
+    cs.Status = 'Closed';
+    update cs;
+    System.enqueueJob(new CaseConfigQueueable(cs));
+  }
+
+  public static void sendConfigInformation(Case caseDetails) {
+    //create payload
+    CasePayload payload = new CasePayload();
+    payload.caseId = caseDetails.Id;
+    payload.status = caseDetails.Status;
+    payload.caseConfigs = caseDetails.Case_Configs__r; // this would send additionl attribute property as well. if required, that can be cleaned up as well.
+
+    //create request
+    HttpRequest req = new HttpRequest();
+    req.setEndpoint('callout:Clark_External_Service');
+    req.setMethod('POST');
+    req.setHeader('Content-Type', 'application/json');
+    req.setBody(JSON.serialize(payload));
+    Http http = new Http();
+    HTTPResponse res = http.send(req);
+
+    if (res.getStatusCode() != 200) {
+      // error handling here
+      // insert platform event for logging errors
+      // platform event trigger would create record in log object
+    }
+
+    // if we need to inform the lwc about success or failure, then we will have to create a plaform event and fire it
+    // then from lwc subscribe to the PE using empAPI and show err to the user
+  }
 }
