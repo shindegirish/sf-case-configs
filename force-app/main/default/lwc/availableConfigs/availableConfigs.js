@@ -23,17 +23,31 @@ export default class AvailableConfigs extends LightningElement {
 
   //reactive properties
   columns = [
-    { label: "Label", fieldName: "Label__c", hideDefaultActions: true },
-    { label: "Type", fieldName: "Type__c", hideDefaultActions: true },
+    {
+      label: "Label",
+      fieldName: "Label__c",
+      hideDefaultActions: true,
+      sortable: true
+    },
+    {
+      label: "Type",
+      fieldName: "Type__c",
+      hideDefaultActions: true,
+      sortable: true
+    },
     {
       label: "Amount",
       fieldName: "Amount__c",
       type: "number",
-      hideDefaultActions: true
+      hideDefaultActions: true,
+      sortable: true
     }
   ];
 
   @track data = [];
+  defaultSortDirection = "asc";
+  sortDirection = "asc";
+  sortedBy;
 
   get showAddButton() {
     return this.data && this.data.length > 0;
@@ -78,6 +92,33 @@ export default class AvailableConfigs extends LightningElement {
     };
     const response = await addConfigsToCase(payload);
     this.processResponse(response);
+  }
+
+  handleSort(event) {
+    console.log(JSON.stringify(event.detail));
+    const { fieldName: sortedBy, sortDirection } = event.detail;
+    const cloneData = [...this.data];
+
+    cloneData.sort(this.sortBy(sortedBy, sortDirection === "asc" ? 1 : -1));
+    this.data = cloneData;
+    this.sortDirection = sortDirection;
+    this.sortedBy = sortedBy;
+  }
+
+  sortBy(field, reverse, primer) {
+    const key = primer
+      ? function (x) {
+          return primer(x[field]);
+        }
+      : function (x) {
+          return x[field];
+        };
+
+    return function (a, b) {
+      a = key(a);
+      b = key(b);
+      return reverse * ((a > b) - (b > a));
+    };
   }
 
   // method to process server response

@@ -1,7 +1,15 @@
 <template>
   <lightning-card title="Available Configs" icon-name="custom:custom19">
     <div class="slds-var-p-vertical_medium slds-var-p-horizontal_x-small">
-      <lightning-datatable key-field="id" data={data} columns={columns}>
+      <lightning-datatable
+        key-field="id"
+        data={data}
+        columns={columns}
+        onsort={handleSort}
+        default-sort-direction={defaultSortDirection}
+        sorted-by={sortedBy}
+        sorted-direction={sortDirection}
+      >
       </lightning-datatable>
     </div>
     <lightning-button
@@ -12,5 +20,8 @@
       variant="brand"
       onclick={handleConfigAdd}
     ></lightning-button>
+
+    <!-- pagination -->
+    <div class="slds-var-p-vertical_medium"></div>
   </lightning-card>
 </template>
