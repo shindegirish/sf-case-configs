@@ -128,6 +128,7 @@ export default class AvailableConfigs extends LightningElement {
     //validation
     if (selectedConfigs.length === 0) {
       this.showToast("Please select at least one Config", undefined, "error");
+      this.isLoading = false;
       return;
     }
 
