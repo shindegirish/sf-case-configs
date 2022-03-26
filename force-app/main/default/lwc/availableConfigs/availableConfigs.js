@@ -35,6 +35,10 @@ export default class AvailableConfigs extends LightningElement {
 
   @track data = [];
 
+  get showAddButton() {
+    return this.data && this.data.length > 0;
+  }
+
   //wired calls
   @wire(MessageContext)
   messageContext;

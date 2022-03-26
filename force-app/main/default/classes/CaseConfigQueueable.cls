@@ -5,6 +5,11 @@ public with sharing class CaseConfigQueueable implements Queueable, Database.All
   }
 
   public void execute(QueueableContext context) {
-    CaseConfigService.sendConfigInformation(caseDetails);
+    try {
+      CaseConfigService.sendConfigInformation(caseDetails);
+    } catch (Exception e) {
+      // log in db and fire PE to let UI know about this fire
+      throw new AsyncException(e);
+    }
   }
 }

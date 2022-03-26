@@ -33,12 +33,19 @@ public with sharing class CaseConfigsController {
    **/
   @AuraEnabled
   public static void sendCaseConfigs(Id caseId) {
+    // to do - send result to controller
     if (String.isBlank(caseId)) {
       throw new AuraHandledException('Case Id cannot be null or blank');
     }
 
     try {
-      CaseConfigService.sendCaseConfigs(caseId);
+      List<Case> closedCases = CaseConfigService.closeCases(
+        new List<Id>{ caseId }
+      );
+
+      if (!closedCases.isEmpty()) {
+        System.enqueueJob(new CaseConfigQueueable(closedCases.get(0)));
+      }
     } catch (Exception e) {
       throw new AuraHandledException(e.getMessage());
     }

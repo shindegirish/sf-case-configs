@@ -34,6 +34,10 @@ export default class CaseConfigs extends LightningElement {
   subscription;
   cachedData;
 
+  get showSendButton() {
+    return this.data && this.data.length > 0;
+  }
+
   //wires
   @wire(MessageContext)
   messageContext;
@@ -46,7 +50,7 @@ export default class CaseConfigs extends LightningElement {
   processWiredData(cachedData) {
     this.cachedData = cachedData;
     const { data, error } = this.cachedData;
-    // to do - handle errors
+    // to do - handle errors, add spinner
     if (error) {
       this.error = "Unknown error";
       if (Array.isArray(error.body)) {
