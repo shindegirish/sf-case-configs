@@ -16,6 +16,7 @@ import addConfigsToCase from "@salesforce/apex/AvailableConfigsController.addCon
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { MessageContext, publish } from "lightning/messageService";
 import notify from "@salesforce/messageChannel/caseConfigNotification__c";
+import { refreshApex } from "@salesforce/apex";
 
 export default class AvailableConfigs extends LightningElement {
   //public properties
@@ -56,6 +57,9 @@ export default class AvailableConfigs extends LightningElement {
   recordsPerPage = 10;
   pageNumber = 1;
 
+  isLoading = false;
+  cachedData;
+
   get totalPages() {
     return Math.ceil(this.masterData.length / this.recordsPerPage);
   }
@@ -77,7 +81,9 @@ export default class AvailableConfigs extends LightningElement {
   messageContext;
 
   @wire(getAllConfigs)
-  wiredConfigs({ data, error }) {
+  wiredConfigs(cachedData) {
+    const { data, error } = cachedData;
+    this.cachedData = cachedData;
     //to do process errors
     if (error) {
       this.error = "Unknown error";
@@ -113,6 +119,7 @@ export default class AvailableConfigs extends LightningElement {
   }
 
   async handleConfigAdd() {
+    this.isLoading = true;
     //get selected rows
     const selectedConfigs = this.template
       .querySelector("lightning-datatable")
@@ -131,6 +138,8 @@ export default class AvailableConfigs extends LightningElement {
     };
     const response = await addConfigsToCase(payload);
     this.processResponse(response);
+    refreshApex(this.cachedData);
+    this.isLoading = false;
   }
 
   handleSort(event) {

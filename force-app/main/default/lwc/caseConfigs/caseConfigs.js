@@ -49,6 +49,8 @@ export default class CaseConfigs extends LightningElement {
   sortDirection = "asc";
   sortedBy;
 
+  isLoading;
+
   get showSendButton() {
     return this.data && this.data.length > 0;
   }
@@ -80,6 +82,7 @@ export default class CaseConfigs extends LightningElement {
 
   //event handlers
   async handleSendClick() {
+    this.isLoading = true;
     const isRequestSuccessful = await sendCaseConfigs({
       caseId: this.recordId
     });
@@ -88,6 +91,7 @@ export default class CaseConfigs extends LightningElement {
       : "Opps! Something went wrong";
     const type = isRequestSuccessful ? "success" : "error";
     this.showToast(title, undefined, type);
+    this.isLoading = false;
   }
 
   handleSort(event) {

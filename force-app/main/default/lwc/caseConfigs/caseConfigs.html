@@ -1,17 +1,22 @@
 <template>
   <lightning-card title="Case Configs" icon-name="custom:custom67">
     <div class="slds-var-p-vertical_medium slds-var-p-horizontal_x-small">
-      <lightning-datatable
-        hide-checkbox-column
-        key-field="id"
-        data={data}
-        columns={columns}
-        onsort={handleSort}
-        default-sort-direction={defaultSortDirection}
-        sorted-by={sortedBy}
-        sorted-direction={sortDirection}
-      >
-      </lightning-datatable>
+      <div if:true={showSendButton}>
+        <lightning-datatable
+          hide-checkbox-column
+          key-field="id"
+          data={data}
+          columns={columns}
+          onsort={handleSort}
+          default-sort-direction={defaultSortDirection}
+          sorted-by={sortedBy}
+          sorted-direction={sortDirection}
+        >
+        </lightning-datatable>
+      </div>
+      <div if:false={showSendButton}>
+        No Case Configs have been added to this case
+      </div>
     </div>
     <div class="slds-var-p-vertical_medium slds-align_absolute-center">
       <lightning-button
@@ -21,6 +26,14 @@
         variant="brand"
         onclick={handleSendClick}
       ></lightning-button>
+    </div>
+    <div if:true={isLoading} class="slds-is-relative">
+      <lightning-spinner
+        variant="brand"
+        size="small"
+        alternative-text="Loading..."
+      >
+      </lightning-spinner>
     </div>
   </lightning-card>
 </template>

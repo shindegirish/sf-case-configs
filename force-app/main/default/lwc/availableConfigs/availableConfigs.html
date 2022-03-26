@@ -50,5 +50,13 @@
         </div>
       </lightning-layout-item>
     </lightning-layout>
+    <div if:true={isLoading} class="slds-is-relative">
+      <lightning-spinner
+        variant="brand"
+        size="small"
+        alternative-text="Loading..."
+      >
+      </lightning-spinner>
+    </div>
   </lightning-card>
 </template>
