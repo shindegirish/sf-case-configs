@@ -22,6 +22,28 @@
     ></lightning-button>
 
     <!-- pagination -->
-    <div class="slds-var-p-vertical_medium"></div>
+    <lightning-layout
+      class="slds-var-p-around_x-small slds-align_absolute-center"
+    >
+      <lightning-layout-item flexibility="auto" padding="horizontal-medium">
+        <div class="slds-float_left">Page 2 | Showing results 10 of 20</div>
+      </lightning-layout-item>
+      <lightning-layout-item flexibility="auto" padding="horizontal-medium">
+        <div class="slds-float_right">
+          <lightning-button
+            label="Previous"
+            icon-name="utility:arrow_left"
+            onclick={handlePrev}
+            class="slds-var-m-right_medium"
+          ></lightning-button>
+          <lightning-button
+            label="Next"
+            variant="brand"
+            icon-name="utility:arrow_right"
+            onclick={handleNext}
+          ></lightning-button>
+        </div>
+      </lightning-layout-item>
+    </lightning-layout>
   </lightning-card>
 </template>
