@@ -14,6 +14,7 @@ import {
 } from "lightning/messageService";
 import notify from "@salesforce/messageChannel/caseConfigNotification__c";
 import { refreshApex } from "@salesforce/apex";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 export default class CaseConfigs extends LightningElement {
   // public props
   @api recordId;
@@ -78,8 +79,15 @@ export default class CaseConfigs extends LightningElement {
   }
 
   //event handlers
-  handleSendClick() {
-    sendCaseConfigs({ caseId: this.recordId });
+  async handleSendClick() {
+    const isRequestSuccessful = await sendCaseConfigs({
+      caseId: this.recordId
+    });
+    const title = isRequestSuccessful
+      ? "Case configs sent successfully!"
+      : "Opps! Something went wrong";
+    const type = isRequestSuccessful ? "success" : "error";
+    this.showToast(title, undefined, type);
   }
 
   handleSort(event) {
@@ -133,5 +141,15 @@ export default class CaseConfigs extends LightningElement {
   unsubscribeToMessageChannel() {
     unsubscribe(this.subscription);
     this.subscription = null;
+  }
+
+  //generic method to fire show toast event
+  showToast(title, message, variant) {
+    const event = new ShowToastEvent({
+      title,
+      message,
+      variant
+    });
+    this.dispatchEvent(event);
   }
 }

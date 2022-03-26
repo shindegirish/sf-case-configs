@@ -87,10 +87,11 @@ public with sharing class CaseConfigService {
 
       //update status field
       for (Case cs : caseList) {
-        if (!cs.Status.equalsIgnoreCase('Closed')) {
-          cs.Status = 'Closed';
-          casesToUpdate.add(cs);
-        }
+        // Commenting the check for testing purpose
+        // if (!cs.Status.equalsIgnoreCase('Closed')) {
+        cs.Status = 'Closed';
+        casesToUpdate.add(cs);
+        //}
       }
 
       if (!casesToUpdate.isEmpty()) {

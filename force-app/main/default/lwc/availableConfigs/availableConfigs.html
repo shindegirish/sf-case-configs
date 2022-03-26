@@ -12,21 +12,24 @@
       >
       </lightning-datatable>
     </div>
-    <lightning-button
-      if:true={showAddButton}
-      class="slds-var-p-vertical_medium slds-align_absolute-center"
-      label="Add"
-      icon-name="utility:add"
-      variant="brand"
-      onclick={handleConfigAdd}
-    ></lightning-button>
+    <div class="slds-var-p-vertical_medium slds-align_absolute-center">
+      <lightning-button
+        if:true={showAddButton}
+        label="Add"
+        icon-name="utility:add"
+        variant="brand"
+        onclick={handleConfigAdd}
+      ></lightning-button>
+    </div>
 
     <!-- pagination -->
     <lightning-layout
       class="slds-var-p-around_x-small slds-align_absolute-center"
     >
       <lightning-layout-item flexibility="auto" padding="horizontal-medium">
-        <div class="slds-float_left">Page 2 | Showing results 10 of 20</div>
+        <div class="slds-float_left">
+          Showing Page {pageNumber} of {totalPages}
+        </div>
       </lightning-layout-item>
       <lightning-layout-item flexibility="auto" padding="horizontal-medium">
         <div class="slds-float_right">
@@ -34,6 +37,7 @@
             label="Previous"
             icon-name="utility:arrow_left"
             onclick={handlePrev}
+            disabled={prevDisabled}
             class="slds-var-m-right_medium"
           ></lightning-button>
           <lightning-button
@@ -41,6 +45,7 @@
             variant="brand"
             icon-name="utility:arrow_right"
             onclick={handleNext}
+            disabled={nextDisabled}
           ></lightning-button>
         </div>
       </lightning-layout-item>

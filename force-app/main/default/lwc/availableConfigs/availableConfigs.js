@@ -45,9 +45,28 @@ export default class AvailableConfigs extends LightningElement {
   ];
 
   @track data = [];
+  masterData = [];
+
+  //sorting
   defaultSortDirection = "asc";
   sortDirection = "asc";
   sortedBy;
+
+  //pagination
+  recordsPerPage = 10;
+  pageNumber = 1;
+
+  get totalPages() {
+    return Math.ceil(this.masterData.length / this.recordsPerPage);
+  }
+
+  get prevDisabled() {
+    return this.pageNumber < 2;
+  }
+
+  get nextDisabled() {
+    return this.pageNumber === this.totalPages;
+  }
 
   get showAddButton() {
     return this.data && this.data.length > 0;
@@ -69,10 +88,30 @@ export default class AvailableConfigs extends LightningElement {
       }
       return;
     }
-    this.data = data;
+    this.masterData = data || [];
+    this.prepData();
+  }
+
+  prepData() {
+    console.log("prep\n", JSON.stringify(this.masterData));
+    const offset = (this.pageNumber - 1) * this.recordsPerPage;
+    this.data = [...this.masterData].slice(
+      offset,
+      offset + this.recordsPerPage
+    );
   }
 
   // event handlers
+  handleNext() {
+    this.pageNumber++;
+    this.prepData();
+  }
+
+  handlePrev() {
+    this.pageNumber--;
+    this.prepData();
+  }
+
   async handleConfigAdd() {
     //get selected rows
     const selectedConfigs = this.template
@@ -95,7 +134,6 @@ export default class AvailableConfigs extends LightningElement {
   }
 
   handleSort(event) {
-    console.log(JSON.stringify(event.detail));
     const { fieldName: sortedBy, sortDirection } = event.detail;
     const cloneData = [...this.data];
 
