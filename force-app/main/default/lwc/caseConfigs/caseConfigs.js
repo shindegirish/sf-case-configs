@@ -43,6 +43,7 @@ export default class CaseConfigs extends LightningElement {
   ];
 
   @track data = [];
+  error;
   subscription;
   cachedData;
   defaultSortDirection = "asc";

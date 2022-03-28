@@ -47,6 +47,7 @@ export default class AvailableConfigs extends LightningElement {
 
   @track data = [];
   masterData = [];
+  error;
 
   //sorting
   defaultSortDirection = "asc";
@@ -99,7 +100,6 @@ export default class AvailableConfigs extends LightningElement {
   }
 
   prepData() {
-    console.log("prep\n", JSON.stringify(this.masterData));
     const offset = (this.pageNumber - 1) * this.recordsPerPage;
     this.data = [...this.masterData].slice(
       offset,
